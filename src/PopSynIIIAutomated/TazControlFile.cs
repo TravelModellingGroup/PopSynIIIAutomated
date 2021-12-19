@@ -71,18 +71,23 @@ internal static class TazControlFile
 }
 
 /// <summary>
-/// 
+/// Represents a control record for a TAZ
 /// </summary>
-/// <param name="Region"></param>
-/// <param name="Puma"></param>
-/// <param name="TAZ"></param>
-/// <param name="TotalHouseholds"></param>
-/// <param name="TotalPopulation"></param>
-/// <param name="Income_classes"></param>
-/// <param name="Male"></param>
-/// <param name="Female"></param>
+/// <param name="Region">The region that the TAZ is in.</param>
+/// <param name="Puma">The PUMA that the TAZ is in.</param>
+/// <param name="TAZ">The TAZ number.</param>
+/// <param name="TotalHouseholds">The total number of households in the TAZ</param>
+/// <param name="TotalPopulation">The total population in the TAZ.</param>
+/// <param name="Income_classes">The number of households that belong to each income class.</param>
+/// <param name="Male">The number of males living in the TAZ.</param>
+/// <param name="Female">The number of females living in the TAZ.</param>
 internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseholds, int TotalPopulation, int[] Income_classes, int Male, int Female)
 {
+    /// <summary>
+    /// Load Taz Control Records from the given lines of CSV text.
+    /// </summary>
+    /// <param name="lines">The lines to process.</param>
+    /// <returns>An array of TAZ control records for each non-header line.</returns>
     internal static TazControlRecord[] LoadRecordsFromLines(string[] lines)
     {
         var ret = new TazControlRecord[lines.Length - 1];
@@ -97,12 +102,12 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
                 int.Parse(parts[4]),
                 new int[]
                 {
-                            int.Parse(parts[5]),
-                            int.Parse(parts[6]),
-                            int.Parse(parts[7]),
-                            int.Parse(parts[8]),
-                            int.Parse(parts[9]),
-                            int.Parse(parts[10]),
+                    int.Parse(parts[6]),
+                    int.Parse(parts[7]),
+                    int.Parse(parts[8]),
+                    int.Parse(parts[9]),
+                    int.Parse(parts[10]),
+                    int.Parse(parts[5]),
                 },
                 int.Parse(parts[11]),
                 int.Parse(parts[12])
@@ -111,6 +116,11 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
         return ret;
     }
 
+    /// <summary>
+    /// Computes a TAZ control that is the average of the given group.
+    /// </summary>
+    /// <param name="group">The group of TAZ records to process, indexed by PUMA.</param>
+    /// <returns>An averaged TAZ control record for the given group.</returns>
     internal static TazControlRecord ComputeGroupAverages(IGrouping<int, TazControlRecord> group)
     {
         float scaleFactor = 1.0f / group.Count();
@@ -119,23 +129,36 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
                 Scale(group.Sum(record => record.TotalPopulation), scaleFactor),
                 new int[]
                 {
-                        Scale(group.Sum(record=> record.Income_classes[0]), scaleFactor),
-                        Scale(group.Sum(record=> record.Income_classes[1]), scaleFactor),
-                        Scale(group.Sum(record=> record.Income_classes[2]), scaleFactor),
-                        Scale(group.Sum(record=> record.Income_classes[3]), scaleFactor),
-                        Scale(group.Sum(record=> record.Income_classes[4]), scaleFactor),
-                        Scale(group.Sum(record=> record.Income_classes[5]), scaleFactor)
+                    Scale(group.Sum(record=> record.Income_classes[0]), scaleFactor),
+                    Scale(group.Sum(record=> record.Income_classes[1]), scaleFactor),
+                    Scale(group.Sum(record=> record.Income_classes[2]), scaleFactor),
+                    Scale(group.Sum(record=> record.Income_classes[3]), scaleFactor),
+                    Scale(group.Sum(record=> record.Income_classes[4]), scaleFactor),
+                    Scale(group.Sum(record=> record.Income_classes[5]), scaleFactor)
                 },
                 Scale(group.Sum(record => record.Male), scaleFactor),
                 Scale(group.Sum(record => record.Female), scaleFactor)
             );
     }
 
+    /// <summary>
+    /// Write the TAZ control to the given stream scaled by the scaling factor.
+    /// </summary>
+    /// <param name="writer">The stream to write to.</param>
+    /// <param name="scaleFactor">The factor to scale the records by.</param>
     internal void WriteScaled(StreamWriter writer, float scaleFactor)
     {
         WriteScaled(writer, scaleFactor, TAZ, Region);
     }
 
+    /// <summary>
+    /// Write the TAZ control to the given stream scaled by the scaling factor.
+    /// The TAZ and Region code will be replaced by the given values.
+    /// </summary>
+    /// <param name="writer">The stream to write to.</param>
+    /// <param name="scaleFactor">The factor to scale the records by.</param>
+    /// <param name="taz">The TAZ number to inject for this record.</param>
+    /// <param name="region">The region number to inject for this record.</param>
     internal void WriteScaled(StreamWriter writer, float scaleFactor, int taz, int region)
     {
         WriteThenComma(writer, region);
