@@ -15,7 +15,7 @@ public class TazControlFileTest
     {
         var lines = File.ReadAllLines("TestFiles/BaseYearData/taz_controls.csv");
         Assert.AreEqual(7, lines.Length, "Our test file had an unexpected number of lines!");
-        var records = TazControlFile.TazControlRecord.LoadRecordsFromLines(lines);
+        var records = TazControlRecord.LoadRecordsFromLines(lines);
         Assert.IsNotNull(records);
         Assert.AreEqual(6, records.Length);
         for (int i = 0; i < records.Length; i++)
@@ -35,9 +35,9 @@ public class TazControlFileTest
         var outputPath = "Output/taz_controls.csv";
         DeleteIfFileExists(outputPath);
         Configuration config = new("TestFiles/Scenarios/TestScenario", "TestFiles", "Output", String.Empty, String.Empty, String.Empty);
-        ZoneSystem zones = new("TestFiles/BaseYearData/Zones.csv");
+        ZoneSystem zones = new(config);
         // Tell it to create a new taz control file where all of the zones should be the same.
-        TazControlFile.CreateForecastTazControls(config, zones, new Dictionary<int, float>()
+        TazControlFile.CreateForecastControls(config, zones, new Dictionary<int, float>()
         {
             { 1, 10.0f },
             { 2, 10.0f },
@@ -47,7 +47,7 @@ public class TazControlFileTest
             { 6, 10.0f }
         });
         Assert.IsTrue(File.Exists(outputPath));
-        var records = TazControlFile.TazControlRecord.LoadRecordsFromLines(File.ReadAllLines(outputPath));
+        var records = TazControlRecord.LoadRecordsFromLines(File.ReadAllLines(outputPath));
         Assert.IsNotNull(records);
         Assert.AreEqual(6, records.Length);
         for (int i = 0; i < records.Length; i++)

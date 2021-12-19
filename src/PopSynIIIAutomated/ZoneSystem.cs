@@ -22,9 +22,10 @@ internal sealed class ZoneSystem
     /// Construct a new zone system from the given file.
     /// </summary>
     /// <param name="fileName">The path to the file to load.</param>
-    public ZoneSystem(string fileName)
+    public ZoneSystem(Configuration config)
     {
         // Load Zones
+        var fileName = Path.Combine(config.InputDirectory, "BaseYearData/zones.csv");
         // TAZ,PD,Region,Ensemble
         _zones = File.ReadLines(fileName)
             .Skip(1)
