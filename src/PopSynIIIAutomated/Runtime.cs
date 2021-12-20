@@ -39,7 +39,7 @@ internal static class Runtime
     }
 
     /// <summary>
-    /// Run the post-processor.  This will export the previously computed results.
+    /// Run the post-processor. This will export the previously computed results.
     /// </summary>
     /// <param name="config">The configuration to use.</param>
     /// <returns>True if the operation succeeds.</returns>
