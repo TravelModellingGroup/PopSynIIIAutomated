@@ -78,10 +78,8 @@ internal static class TazControlFile
 /// <param name="TAZ">The TAZ number.</param>
 /// <param name="TotalHouseholds">The total number of households in the TAZ</param>
 /// <param name="TotalPopulation">The total population in the TAZ.</param>
-/// <param name="Income_classes">The number of households that belong to each income class.</param>
-/// <param name="Male">The number of males living in the TAZ.</param>
-/// <param name="Female">The number of females living in the TAZ.</param>
-internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseholds, int TotalPopulation, int[] Income_classes, int Male, int Female)
+/// <param name="AdditionalControls">Additional controls for the TAZ</param>
+internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseholds, int TotalPopulation, int[] AdditionalControls)
 {
     /// <summary>
     /// Load Taz Control Records from the given lines of CSV text.
@@ -98,19 +96,10 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
                 int.Parse(parts[0]),
                 int.Parse(parts[1]),
                 int.Parse(parts[2]),
-                int.Parse(parts[3]),
                 int.Parse(parts[4]),
-                new int[]
-                {
-                    int.Parse(parts[6]),
-                    int.Parse(parts[7]),
-                    int.Parse(parts[8]),
-                    int.Parse(parts[9]),
-                    int.Parse(parts[10]),
-                    int.Parse(parts[5]),
-                },
-                int.Parse(parts[11]),
-                int.Parse(parts[12])
+                int.Parse(parts[5]),
+                // Read the rest
+                parts.Skip(6).Select(x => int.Parse(x)).ToArray()
             );
         }
         return ret;
@@ -124,21 +113,15 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
     internal static TazControlRecord ComputeGroupAverages(IGrouping<int, TazControlRecord> group)
     {
         float scaleFactor = 1.0f / group.Count();
+        var additionalControls = new int[group.First().AdditionalControls.Length];
+        for (int i = 0; i < additionalControls.Length; i++)
+        {
+            additionalControls[i] = Scale(group.Sum(record => record.AdditionalControls[i]), scaleFactor);
+        }
         return new TazControlRecord(-1, group.Key, -1,
                 Scale(group.Sum(record => record.TotalHouseholds), scaleFactor),
                 Scale(group.Sum(record => record.TotalPopulation), scaleFactor),
-                new int[]
-                {
-                    Scale(group.Sum(record=> record.Income_classes[0]), scaleFactor),
-                    Scale(group.Sum(record=> record.Income_classes[1]), scaleFactor),
-                    Scale(group.Sum(record=> record.Income_classes[2]), scaleFactor),
-                    Scale(group.Sum(record=> record.Income_classes[3]), scaleFactor),
-                    Scale(group.Sum(record=> record.Income_classes[4]), scaleFactor),
-                    Scale(group.Sum(record=> record.Income_classes[5]), scaleFactor)
-                },
-                Scale(group.Sum(record => record.Male), scaleFactor),
-                Scale(group.Sum(record => record.Female), scaleFactor)
-            );
+                additionalControls);
     }
 
     /// <summary>
@@ -164,13 +147,16 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
         WriteThenComma(writer, region);
         WriteThenComma(writer, Puma);
         WriteThenComma(writer, taz);
+        WriteThenComma(writer, taz);
         WriteThenComma(writer, TotalHouseholds, scaleFactor);
         WriteThenComma(writer, TotalPopulation, scaleFactor);
-        for (int i = 0; i < Income_classes.Length; i++)
+        if (AdditionalControls.Length > 0)
         {
-            WriteThenComma(writer, Income_classes[i], scaleFactor);
+            for (int i = 0; i < AdditionalControls.Length - 1; i++)
+            {
+                WriteThenComma(writer, AdditionalControls[i], scaleFactor);
+            }
+            writer.WriteLine(Scale(AdditionalControls[^1], scaleFactor));
         }
-        WriteThenComma(writer, Male, scaleFactor);
-        writer.WriteLine(Scale(Female, scaleFactor));
     }
 }

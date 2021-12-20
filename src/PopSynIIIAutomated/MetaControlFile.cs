@@ -71,7 +71,7 @@ internal record MetaControlRecord(int Puma, int TotalHouseholds, int TotalPopula
     /// <param name="writer">The stream to write to.</param>
     internal static void WriteHeader(StreamWriter writer)
     {
-        writer.WriteLine("PUMA,totalhh,totpop");
+        writer.WriteLine("puma,totalhh,totpop");
     }
 
     /// <summary>
