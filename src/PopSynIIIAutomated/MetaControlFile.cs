@@ -34,10 +34,11 @@ internal static class MetaControlFile
 /// <summary>
 /// Contains a record of the meta control.
 /// </summary>
-/// <param name="Puma">The region that is being controlled.</param>
+/// <param name="Region">The region that is being controlled.</param>
+/// <param name="Puma">The puma that this region belongs to.</param>
 /// <param name="TotalHouseholds">The total households expected for the region.</param>
 /// <param name="TotalPopulation">The total population expected for the region.</param>
-internal record MetaControlRecord(int Puma, int TotalHouseholds, int TotalPopulation)
+internal record MetaControlRecord(int Region, int Puma, int TotalHouseholds, int TotalPopulation)
 {
     /// <summary>
     /// Creates a meta control record given the TAZ control records.
@@ -47,6 +48,7 @@ internal record MetaControlRecord(int Puma, int TotalHouseholds, int TotalPopula
     internal static MetaControlRecord CreateFrom(IGrouping<int, TazControlRecord> group)
     {
         return new MetaControlRecord(group.Key,
+            group.First().Puma,
             group.Sum(record => record.TotalHouseholds),
             group.Sum(record => record.TotalPopulation));
     }
@@ -55,13 +57,13 @@ internal record MetaControlRecord(int Puma, int TotalHouseholds, int TotalPopula
     /// Creates meta control records from TAZ control records.
     /// </summary>
     /// <param name="tazControlRecords">The records to build the meta controls from.</param>
-    /// <returns>Meta controls ordered by PUMA.</returns>
+    /// <returns>Meta controls ordered by region.</returns>
     internal static MetaControlRecord[] CreateMetaControlsFrom(TazControlRecord[] tazControlRecords)
     {
         return tazControlRecords
-            .GroupBy(record => record.Puma)
+            .GroupBy(record => record.Region)
             .Select(group => MetaControlRecord.CreateFrom(group))
-            .OrderBy(record => record.Puma)
+            .OrderBy(record => record.Region)
             .ToArray();
     }
 
@@ -71,7 +73,7 @@ internal record MetaControlRecord(int Puma, int TotalHouseholds, int TotalPopula
     /// <param name="writer">The stream to write to.</param>
     internal static void WriteHeader(StreamWriter writer)
     {
-        writer.WriteLine("puma,totalhh,totpop");
+        writer.WriteLine("region,puma,totalhh,totpop");
     }
 
     /// <summary>
@@ -80,6 +82,7 @@ internal record MetaControlRecord(int Puma, int TotalHouseholds, int TotalPopula
     /// <param name="writer">The stream to write the record to.</param>
     internal void Write(StreamWriter writer)
     {
+        WriteThenComma(writer, Region);
         WriteThenComma(writer, Puma);
         WriteThenComma(writer, TotalHouseholds);
         writer.WriteLine(TotalPopulation);
