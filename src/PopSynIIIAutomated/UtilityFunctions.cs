@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace PopSynIIIAutomated;
@@ -14,6 +15,28 @@ internal static class UtilityFunctions
     /// <param name="writer">The stream to write to.</param>
     /// <param name="value">The value to write.</param>
     internal static void WriteThenComma(StreamWriter writer, int value)
+    {
+        writer.Write(value);
+        writer.Write(',');
+    }
+
+    /// <summary>
+    /// Write the value to the stream followed by a comma.
+    /// </summary>
+    /// <param name="writer">The stream to write to.</param>
+    /// <param name="value">The value to write.</param>
+    internal static void WriteThenComma(StreamWriter writer, float value)
+    {
+        writer.Write(value);
+        writer.Write(',');
+    }
+
+    /// <summary>
+    /// Write the value to the stream followed by a comma.
+    /// </summary>
+    /// <param name="writer">The stream to write to.</param>
+    /// <param name="value">The value to write.</param>
+    internal static void WriteThenComma(StreamWriter writer, char value)
     {
         writer.Write(value);
         writer.Write(',');
@@ -52,11 +75,35 @@ internal static class UtilityFunctions
     internal static string CreateDirectories(string path)
     {
         var dirName = Path.GetDirectoryName(path);
-        if (dirName is not null)
+        if (!string.IsNullOrWhiteSpace(dirName))
         {
             Directory.CreateDirectory(dirName);
         }
         return path;
+    }
+
+    /// <summary>
+    /// Add quotes around the provided path.
+    /// </summary>
+    /// <param name="path">The path to add quotes around.</param>
+    /// <returns>The path with quotes around it.</returns>
+    internal static string AddQuotes(string path)
+    {
+        return string.Concat("\"", path, "\"");
+    }
+
+    /// <summary>
+    /// Break apart a stream reader's input into a stream of lines.
+    /// </summary>
+    /// <param name="reader">The reader to stream from.</param>
+    /// <returns>A stream of strings, one for each line of text in the StreamReader.</returns>
+    internal static IEnumerable<string> StreamLines(StreamReader reader)
+    {
+        string? line;
+        while((line = reader.ReadLine()) is not null)
+        {
+            yield return line;
+        }
     }
 }
 

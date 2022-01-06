@@ -1,0 +1,62 @@
+There are no headers for the outpput from MySQL so the following are the columns in order.
+
+SyntheticHouseholds.csv
+
++-----------------+------------+--------+
+| Field           | Type       | Extra  |
++-----------------+------------+--------+
+| tempId          | int(11)    |    0   |
+| region          | int(11)    |    1   |
+| puma            | int(11)    |    2   |
+| taz             | int(11)    |    3   |
+| maz             | int(11)    |    4   |
+| weight          | float      |    5   |
+| finalPumsId     | int(11)    |    6   |
+| finalweight     | int(11)    |    7   |
+| DwellingType    | tinyint(4) |    8   |
+| NumberOfPersons | tinyint(4) |    9   |
+| Vehicles        | tinyint(4) |    10  |
+| IncomeClass     | tinyint(4) |    11  |
++-----------------+------------+--------+
+
+
+SyntheticPersons.csv
+
++------------------+---------+------+-----+---------+-------+
+| Field            | Type    | Null | Key | Default | Extra |
++------------------+---------+------+-----+---------+-------+
+| tempId           | int(11) | NO   |     | 0       |       |
+| region           | int(11) | YES  |     | NULL    |       |
+| puma             | int(11) | YES  |     | NULL    |       |
+| taz              | int(11) | YES  |     | NULL    |       |
+| maz              | int(11) | YES  |     | NULL    |       |
+| weight           | float   | YES  |     | NULL    |       |
+| finalPumsId      | int(11) | YES  |     | NULL    |       |
+| finalweight      | int(11) | YES  |     | NULL    |       |
+| PersonNumber     | int(11) | YES  |     | NULL    |       |
+| Age              | int(11) | YES  |     | NULL    |       |
+| Sex              | int(11) | YES  |     | NULL    |       |
+| License          | int(11) | YES  |     | NULL    |       |
+| TransitPass      | int(11) | YES  |     | NULL    |       |
+| EmploymentStatus | int(11) | YES  |     | NULL    |       |
+| Occupation       | int(11) | YES  |     | NULL    |       |
+| FreeParking      | int(11) | YES  |     | NULL    |       |
+| StudentStatus    | int(11) | YES  |     | NULL    |       |
+| EmploymentZone   | int(11) | YES  |     | NULL    |       |
+| SchoolZone       | int(11) | YES  |     | NULL    |       |
++------------------+---------+------+-----+---------+-------+
+
+"Occupation": {
+  "G": 1,
+  "S": 2,
+  "M": 3,
+  "P": 4,
+  "O": 5
+},
+"EmploymentStatus": {
+  "O": 1,
+  "F": 2,
+  "P": 3,
+  "J": 4,
+  "H": 5
+}

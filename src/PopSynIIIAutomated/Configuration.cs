@@ -14,6 +14,7 @@ namespace PopSynIIIAutomated;
 /// <param name="DatabaseName">The name of the database that will be used</param>
 /// <param name="DatabaseUsername">The name of the user for the database</param>
 /// <param name="DatabasePassword">The password for the database user</param>
+/// <param name="JavaDirectory">The location of the Java Runtime Environment installation</param>
 internal record class Configuration
     (
         string ScenarioDirectory,
@@ -21,7 +22,8 @@ internal record class Configuration
         string OutputDirectory,
         string DatabaseName,
         string DatabaseUsername,
-        string DatabasePassword
+        string DatabasePassword,
+        string JavaDirectory
     )
 {
     /// <summary>
@@ -45,7 +47,8 @@ internal record class Configuration
     /// <summary>
     /// Gets the default configuration.
     /// </summary>
-    private static Configuration DefaultConfiguration => new(string.Empty, string.Empty, string.Empty, "TorontoPopSynIII", "root", string.Empty);
+    internal static Configuration DefaultConfiguration => new(string.Empty, string.Empty, string.Empty,
+        "TorontoPopSynIII", "root", string.Empty, "C:\\Program Files\\Java\\jre7");
 
     /// <summary>
     /// Save the configuration to file.
@@ -54,14 +57,10 @@ internal record class Configuration
     /// <exception cref="System.IO.IOException">Thrown when we are unable to write to the file.</exception>
     public void Save(string filePath)
     {
-        if (Path.GetDirectoryName(filePath) is string dirName)
-        {
-            Directory.CreateDirectory(dirName);
-        }
+        _ = UtilityFunctions.CreateDirectories(filePath);
         File.WriteAllText(filePath, JsonSerializer.Serialize(this, typeof(Configuration), new JsonSerializerOptions()
         {
             WriteIndented = true
         }));
     }
 }
-
