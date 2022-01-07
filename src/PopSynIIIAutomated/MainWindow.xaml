@@ -5,8 +5,53 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PopSynIIIAutomated"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="PopSynIII Automated" Height="AUTO" Width="800">
     <Grid>
-        <Button Click="Run_Clicked">Run Test</Button>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid Grid.Column="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="AUTO"/>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="AUTO" />
+                    <RowDefinition Height="AUTO" />
+                    <RowDefinition Height="AUTO" />
+                    <RowDefinition Height="AUTO" />
+                    <RowDefinition Height="AUTO" />
+                    <RowDefinition Height="AUTO" />
+                    <RowDefinition Height="AUTO" />
+                </Grid.RowDefinitions>
+                <Label Grid.Row="0" Grid.Column="0">Scenario Directory</Label>
+                <Label Grid.Row="1" Grid.Column="0">Input Directory</Label>
+                <Label Grid.Row="2" Grid.Column="0">Output Directory</Label>
+                <Label Grid.Row="3" Grid.Column="0">Database Name</Label>
+                <Label Grid.Row="4" Grid.Column="0">Database Username</Label>
+                <Label Grid.Row="5" Grid.Column="0">Database Password</Label>
+                <Label Grid.Row="6" Grid.Column="0">Java Directory</Label>
+                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ScenarioDirectory}" HorizontalAlignment="Stretch"/>
+                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding InputDirectory}" HorizontalAlignment="Stretch"/>
+                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding OutputDirectory}" HorizontalAlignment="Stretch"/>
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding DatabaseName}" HorizontalAlignment="Stretch"/>
+                <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding DatabaseUsername}" HorizontalAlignment="Stretch"/>
+                <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding DatabasePassword}" HorizontalAlignment="Stretch"/>
+                <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding JavaDirectory}" HorizontalAlignment="Stretch"/>
+            </Grid>
+        </Grid>
+        <Grid Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Click="Run_Clicked">Run All</Button>
+            <Button Grid.Row="1" Click="RunPreprocessor_Clicked">Run PreProcessor</Button>
+            <Button Grid.Row="2" Click="RunPostprocessor_Clicked">Run PostProcessor</Button>
+        </Grid>
+        
     </Grid>
 </Window>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -28,8 +29,7 @@ internal static class TazControlFile
         using (var writer = new StreamWriter(outputFilePath))
         {
             // region,puma,taz,totalhh,totpop,income_class_1,income_class_2,income_class_3,income_class_4,income_class_5,income_class_6,male,female
-            // write out the header
-            writer.WriteLine(lines[0]);
+            TazControlRecord.WriteHeader(writer, lines[0]);
             foreach (var record in zoneRecords)
             {
                 var zone = zoneSystem.GetZone(zoneSystem.ZoneNumberToZoneIndex(record.TAZ));
@@ -135,6 +135,24 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
     }
 
     /// <summary>
+    /// Writes out the header for the given TAZ control header line.
+    /// </summary>
+    /// <param name="writer">The stream to save the data to.</param>
+    /// <param name="headerLine">The base year header line.</param>
+    internal static void WriteHeader(StreamWriter writer, string headerLine)
+    {
+        var headerParts = headerLine.Split(',');
+        writer.Write("region,puma,taz,maz,totalhh,totpop");
+        // Write out all of the additional properties
+        for(int i = 6;i < headerParts.Length;i++)
+        {
+            writer.Write(',');
+            writer.Write(headerParts[i]);
+        }
+        writer.WriteLine();
+    }
+
+    /// <summary>
     /// Write the TAZ control to the given stream scaled by the scaling factor.
     /// The TAZ and Region code will be replaced by the given values.
     /// </summary>
@@ -144,19 +162,37 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
     /// <param name="region">The region number to inject for this record.</param>
     internal void WriteScaled(StreamWriter writer, float scaleFactor, int taz, int region)
     {
+        var population = Scale(TotalPopulation, scaleFactor);
+        var households = Scale(TotalHouseholds, scaleFactor);
         WriteThenComma(writer, region);
         WriteThenComma(writer, Puma);
         WriteThenComma(writer, taz);
         WriteThenComma(writer, taz);
-        WriteThenComma(writer, TotalHouseholds, scaleFactor);
-        WriteThenComma(writer, TotalPopulation, scaleFactor);
-        if (AdditionalControls.Length > 0)
+        if(population > 0)
         {
-            for (int i = 0; i < AdditionalControls.Length - 1; i++)
+            // If there is a person living in the zone we need to have a house for them.
+            WriteThenComma(writer, Math.Max(households, 1));
+            WriteThenComma(writer, population);
+            if (AdditionalControls.Length > 0)
             {
-                WriteThenComma(writer, AdditionalControls[i], scaleFactor);
+                for (int i = 0; i < AdditionalControls.Length - 1; i++)
+                {
+                    WriteThenComma(writer, AdditionalControls[i], scaleFactor);
+                }
+                writer.WriteLine(Scale(AdditionalControls[^1], scaleFactor));
             }
-            writer.WriteLine(Scale(AdditionalControls[^1], scaleFactor));
+        }
+        else
+        {
+            writer.Write("0,0,");
+            if (AdditionalControls.Length > 0)
+            {
+                for (int i = 0; i < AdditionalControls.Length - 1; i++)
+                {
+                    WriteThenComma(writer, 0);
+                }
+                writer.WriteLine(0);
+            }
         }
     }
 }

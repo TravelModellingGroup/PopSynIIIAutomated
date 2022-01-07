@@ -14,11 +14,12 @@ public class TazControlFileTest
     public void LoadInControls()
     {
         var lines = File.ReadAllLines("TestFiles/BaseYearData/taz_controls.csv");
-        Assert.AreEqual(7, lines.Length, "Our test file had an unexpected number of lines!");
+        Assert.AreEqual(8, lines.Length, "Our test file had an unexpected number of lines!");
         var records = TazControlRecord.LoadRecordsFromLines(lines);
         Assert.IsNotNull(records);
-        Assert.AreEqual(6, records.Length);
-        for (int i = 0; i < records.Length; i++)
+        Assert.AreEqual(7, records.Length);
+        // The last record has a zero population
+        for (int i = 0; i < records.Length - 1; i++)
         {
             Assert.AreEqual(i + 1, records[i].TAZ);
             Assert.AreEqual((i + 1) * 10, records[i].TotalPopulation);
@@ -34,7 +35,7 @@ public class TazControlFileTest
     {
         var outputPath = "Output/taz_controls.csv";
         DeleteIfFileExists(outputPath);
-        Configuration config = new("TestFiles/Scenarios/TestScenario", "TestFiles", "Output", String.Empty, String.Empty, String.Empty);
+        Configuration config = new("TestFiles/Scenarios/TestScenario", "TestFiles", "Output", String.Empty, String.Empty, String.Empty, String.Empty);
         ZoneSystem zones = new(config);
         // Tell it to create a new taz control file where all of the zones should be the same.
         TazControlFile.CreateForecastControls(config, zones, new Dictionary<int, float>()
@@ -44,12 +45,13 @@ public class TazControlFileTest
             { 3, 10.0f },
             { 4, 10.0f },
             { 5, 10.0f },
-            { 6, 10.0f }
+            { 6, 10.0f },
+            { 7, 10.0f }
         });
         Assert.IsTrue(File.Exists(outputPath));
         var records = TazControlRecord.LoadRecordsFromLines(File.ReadAllLines(outputPath));
         Assert.IsNotNull(records);
-        Assert.AreEqual(6, records.Length);
+        Assert.AreEqual(7, records.Length);
         for (int i = 0; i < records.Length; i++)
         {
             Assert.AreEqual(i + 1, records[i].TAZ);
