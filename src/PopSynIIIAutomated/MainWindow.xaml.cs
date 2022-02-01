@@ -10,12 +10,21 @@ namespace PopSynIIIAutomated
     public partial class MainWindow : Window
     {
         private const string ConfigurationFilePath = "config.json";
-
+        private static string RunBoxText = string.Empty;
         public MainWindow()
         {
             InitializeComponent();
             IsEnabled = false;
             DataContext = new ConfigurationModel(Configuration.DefaultConfiguration);
+            // Setup the runtime to dump out to a message box
+            Runtime.DisplayToUser = (message) =>
+            {
+                RunBoxText = string.Concat(RunBoxText, "\n",  message);
+                Dispatcher.Invoke(() =>
+                {
+                    RunTextBox.Text = RunBoxText;
+                });
+            };
             Task.Run(() =>
             {
                 var config = Configuration.Load(ConfigurationFilePath);
@@ -31,14 +40,13 @@ namespace PopSynIIIAutomated
                 }
                 Dispatcher.Invoke(() =>
                 {
-                    this.IsEnabled = true;
+                    IsEnabled = true;
                 });
             });
         }
 
         private async void Run_Clicked(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
             try
             {
                 await RunAllAsync((DataContext as ConfigurationModel)?.GetConfiguration() ?? Configuration.DefaultConfiguration);
@@ -47,14 +55,13 @@ namespace PopSynIIIAutomated
             {
                 ShowErrorMessage((ex.Message ?? "") + "\r\n" + ex.StackTrace);
             }
-            this.IsEnabled = true;
         }
 
         private void ShowErrorMessage(string errorMessage)
         {
             Dispatcher.Invoke(() =>
             {
-                MessageBox.Show(errorMessage);
+                MessageBox.Show(this, errorMessage);
             });
         }
 
@@ -87,7 +94,6 @@ namespace PopSynIIIAutomated
 
         private async void RunPreprocessor_Clicked(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
             try
             {
                 await RunPreProcessorAsync((DataContext as ConfigurationModel)?.GetConfiguration() ?? Configuration.DefaultConfiguration);
@@ -96,12 +102,10 @@ namespace PopSynIIIAutomated
             {
                 ShowErrorMessage((ex.Message ?? "") + "\r\n" + ex.StackTrace);
             }
-            this.IsEnabled = true;
         }
 
         private async void RunPostprocessor_Clicked(object sender, RoutedEventArgs e)
         {
-            this.IsEnabled = false;
             try
             {
                 await RunPostProcessorAsync((DataContext as ConfigurationModel)?.GetConfiguration() ?? Configuration.DefaultConfiguration);
@@ -110,7 +114,6 @@ namespace PopSynIIIAutomated
             {
                 ShowErrorMessage((ex.Message ?? "") + "\r\n" + ex.StackTrace);
             }
-            this.IsEnabled = true;
         }
     }
 }
