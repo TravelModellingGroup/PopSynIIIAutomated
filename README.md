@@ -23,5 +23,5 @@ make it compatible on additional platforms.
 
 The unit tests come with some small test input files.  Constructing the full
 input file directory is out of the scope of this documentation.  Please refer
-to the [user guide](https://tmg.utoronto.ca/doc/1.6/gtamode/user_guide/PopSynIII/index.html)
+to the [user guide](https://tmg.utoronto.ca/doc/1.6/gtamodel/user_guide/PopulationSynthesis/PopSynIII/index.html)
 to learn how to construct your own inputs.
