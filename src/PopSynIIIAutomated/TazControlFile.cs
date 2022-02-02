@@ -22,6 +22,7 @@ internal static class TazControlFile
     public static bool CreateForecastControls(Configuration configuration, ZoneSystem zoneSystem,
         Dictionary<int, float> forecastPopulation)
     {
+        const float minimumBaseYearPopulation = 50;
         var lines = File.ReadAllLines(Path.Combine(configuration.InputDirectory, "BaseYearData/taz_controls.csv"));
         var zoneRecords = TazControlRecord.LoadRecordsFromLines(lines);
         var pumaRecords = ComputePUMAAverages(zoneRecords);
@@ -37,7 +38,7 @@ internal static class TazControlFile
                 // Two cases:
                 // If there was already population in the base year just scale up the zone's inputs                    
                 // If there was not, compute the average
-                if (zone.BaseYearPopulation > 0.0f)
+                if (zone.BaseYearPopulation > minimumBaseYearPopulation)
                 {
                     // Scale the individual record
                     record.WriteScaled(writer, targetPopulation / zone.BaseYearPopulation);

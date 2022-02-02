@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace PopSynIIIAutomated;
 
@@ -105,5 +108,47 @@ internal static class UtilityFunctions
             yield return line;
         }
     }
-}
 
+    internal static int RunProcess(string programName, string cwd, string arguments, string? addToPath)
+    {
+        static void ReadFromStream(StreamReader reader)
+        {
+            while (!reader.EndOfStream)
+            {
+                var line = reader.ReadLine();
+                if (line is not null)
+                {
+                    Runtime.WriteToUser(line);
+                }
+            }
+        }
+
+        var process = new Process()
+        {
+            StartInfo = new ProcessStartInfo(programName, arguments)
+            {
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true,
+                WorkingDirectory = cwd,
+            }
+        };
+
+        if (addToPath is not null)
+        {
+            process.StartInfo.EnvironmentVariables["PATH"] += ";" + addToPath;
+        }
+        process.Start();
+        Parallel.Invoke(
+            () =>
+            {
+                ReadFromStream(process.StandardOutput);
+            }, () =>
+            {
+                ReadFromStream(process.StandardError);
+            });
+        process.WaitForExit();
+        return process.ExitCode;
+    }
+}

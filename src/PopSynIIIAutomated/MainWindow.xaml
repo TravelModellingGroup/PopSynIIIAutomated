@@ -25,6 +25,8 @@
                     <RowDefinition Height="AUTO" />
                     <RowDefinition Height="AUTO" />
                     <RowDefinition Height="AUTO" />
+
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
                 <Label Grid.Row="0" Grid.Column="0">Scenario Directory</Label>
                 <Label Grid.Row="1" Grid.Column="0">Input Directory</Label>
@@ -40,6 +42,9 @@
                 <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding DatabaseUsername}" HorizontalAlignment="Stretch"/>
                 <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding DatabasePassword}" HorizontalAlignment="Stretch"/>
                 <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding JavaDirectory}" HorizontalAlignment="Stretch"/>
+
+                <TextBox x:Name="RunTextBox" Grid.Row="7" Grid.Column="0" Grid.ColumnSpan="2" ScrollViewer.VerticalScrollBarVisibility="Visible" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                         IsReadOnly="True" IsReadOnlyCaretVisible="True" IsUndoEnabled="False" ScrollViewer.HorizontalScrollBarVisibility="Auto"/>
             </Grid>
         </Grid>
         <Grid Grid.Column="1">

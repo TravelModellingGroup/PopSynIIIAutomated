@@ -1,4 +1,6 @@
-﻿namespace PopSynIIIAutomated;
+﻿using System;
+
+namespace PopSynIIIAutomated;
 
 /// <summary>
 /// Provides calls for the main Use-Cases.
@@ -46,5 +48,19 @@ internal static class Runtime
     public static bool RunPostProcessor(Configuration config)
     {
         return Postprocessor.Run(config);
+    }
+
+    /// <summary>
+    /// Set the function for displaying messages to the user.
+    /// </summary>
+    public static Action<string>? DisplayToUser;
+
+    /// <summary>
+    /// This is called internally to send messages to the user.
+    /// </summary>
+    /// <param name="message">The message to send to the user.</param>
+    internal static void WriteToUser(string message)
+    {
+        DisplayToUser?.Invoke(message);
     }
 }
