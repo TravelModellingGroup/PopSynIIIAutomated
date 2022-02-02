@@ -58,9 +58,6 @@ internal static class PopSynController
             && MYSQL.LoadTableFromFile(config, "control_totals_maz", mazControls)
             && MYSQL.LoadTableFromFile(config, "control_totals_taz", tazControls)
             && MYSQL.LoadTableFromFile(config, "control_totals_meta", metaControls)
-            // ECHO Processing Control Tables...
-            // CALL % MYSQL_EXE % --host =% SQLSERVER % --user =% DB_USER % --password =% DB_PWD % % DATABASE % -e "source %MY_PATH%\scripts\ControlsTableProcessing.sql" > "%MY_PATH%\outputs\serverLog"
-            && MYSQL.ExecuteScript(config, Path.Combine(config.InputDirectory, "scripts/ControlsTableProcessing.sql"))
         ;
     }
 
