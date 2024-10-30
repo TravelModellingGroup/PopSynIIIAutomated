@@ -39,7 +39,7 @@ internal static class PopSynController
         Runtime.WriteToUser($"Initializing Database");
         return
             // CALL % MYSQL_EXE % --host =% SQLSERVER % --user =% DB_USER % --password =% DB_PWD % % DATABASE % -e "source %MY_PATH%\scripts\PUMFTableCreation.sql" > "%MY_PATH%\outputs\serverLog"
-            MYSQL.ExecuteScript(config, Path.Combine(config.InputDirectory, "scripts/PUMFTableCreation.sql"))
+            MYSQL.ExecuteScript(config, Path.Combine(config.InputDirectory, "scripts/PUMFTableCreation.sql"), "Creating PUMF tables.")
             // Upload Data From CSV Files
             // CALL % MYSQL_EXE % --host =% SQLSERVER % --user =% DB_USER % --password =% DB_PWD % % DATABASE % -e "SET sql_mode=''; LOAD DATA INFILE %pumsHH_File% INTO TABLE pumf_hh FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES;" > "%MY_PATH%\outputs\serverLog"
             // CALL % MYSQL_EXE % --host =% SQLSERVER % --user =% DB_USER % --password =% DB_PWD % % DATABASE % -e "SET sql_mode=''; LOAD DATA INFILE %pumsPersons_File% INTO TABLE pumf_person FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES;" > "%MY_PATH%\outputs\serverLog"
@@ -47,10 +47,10 @@ internal static class PopSynController
             && MYSQL.LoadTableFromFile(config, "pumf_person", pumsPersonsFile)
             // ECHO Processing PUMS tables...
             // CALL % MYSQL_EXE % --host =% SQLSERVER % --user =% DB_USER % --password =% DB_PWD % % DATABASE % -e "source %MY_PATH%\scripts\PUMFTableProcessing.sql" > "%MY_PATH%\outputs\serverLog"
-            && MYSQL.ExecuteScript(config, Path.Combine(config.InputDirectory, "scripts/PUMFTableProcessing.sql"))
+            && MYSQL.ExecuteScript(config, Path.Combine(config.InputDirectory, "scripts/PUMFTableProcessing.sql"), "Processing PUMF Tables")
             // ECHO Creating Control Tables..
             // CALL % MYSQL_EXE % --host =% SQLSERVER % --user =% DB_USER % --password =% DB_PWD % % DATABASE % -e "source %MY_PATH%\scripts\ControlsTableCreation.sql" > "%MY_PATH%\outputs\serverLog"
-            && MYSQL.ExecuteScript(config, Path.Combine(config.InputDirectory, "scripts/ControlsTableCreation.sql"))
+            && MYSQL.ExecuteScript(config, Path.Combine(config.InputDirectory, "scripts/ControlsTableCreation.sql"), "Creating Control Tables")
             // ECHO Uploading Control Tables...
             // CALL % MYSQL_EXE % --host =% SQLSERVER % --user =% DB_USER % --password =% DB_PWD % % DATABASE % -e "SET sql_mode=''; LOAD DATA INFILE %mazData_File% INTO TABLE control_totals_maz FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES;" > "%MY_PATH%\outputs\serverLog"
             // CALL % MYSQL_EXE % --host =% SQLSERVER % --user =% DB_USER % --password =% DB_PWD % % DATABASE % -e "SET sql_mode=''; LOAD DATA INFILE %tazData_File% INTO TABLE control_totals_taz FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n' IGNORE 1 LINES;" > "%MY_PATH%\outputs\serverLog"

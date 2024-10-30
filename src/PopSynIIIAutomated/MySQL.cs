@@ -38,9 +38,14 @@ internal static class MYSQL
     /// </summary>
     /// <param name="config">The configuration to execute.</param>
     /// <param name="scriptPath">The full path to the script file.</param>
+    /// <param name="message">An optional message to send to the use before running this script.</param>
     /// <returns>If the operation completed successfully.</returns>
-    public static bool ExecuteScript(Configuration config, string scriptPath)
+    public static bool ExecuteScript(Configuration config, string scriptPath, string? message = null)
     {
+        if(message is not null)
+        {
+            Runtime.WriteToUser(message);
+        }
         try
         {
             var arguments = $"--user={config.DatabaseUsername} --password={config.DatabasePassword} {config.DatabaseName} -e \"source {scriptPath}\"";

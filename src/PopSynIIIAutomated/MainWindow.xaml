@@ -52,10 +52,12 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Button Grid.Row="0" Click="Run_Clicked">Run All</Button>
-            <Button Grid.Row="1" Click="RunPreprocessor_Clicked">Run PreProcessor</Button>
-            <Button Grid.Row="2" Click="RunPostprocessor_Clicked">Run PostProcessor</Button>
+            <Button Grid.Row="1" Click="RunPreProcessor_Clicked">Run PreProcessor</Button>
+            <Button Grid.Row="2" Click="RunWithoutPreProcessor_Clicked">Run Without PreProcessor</Button>
+            <Button Grid.Row="3" Click="RunPostProcessor_Clicked">Run PostProcessor</Button>
         </Grid>
         
     </Grid>

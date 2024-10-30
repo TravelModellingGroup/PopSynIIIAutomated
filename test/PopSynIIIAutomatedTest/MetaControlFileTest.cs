@@ -6,10 +6,10 @@ public class MetaControlFileTest
     [TestMethod]
     public void CreateMetaRecord()
     {
-        var tazRecords = TazControlRecord.LoadRecordsFromLines(File.ReadAllLines("TestFiles/BaseYearData/taz_controls.csv"));
+        var tazRecords = TazControlRecord.LoadRecordsFromLines(File.ReadAllLines("TestFiles/BaseYearData/taz_controls.csv"), out var additionalHeaders);
         Assert.IsNotNull(tazRecords);
         Assert.AreEqual(7, tazRecords.Length, "We read in an unexpected number of TAZ!");
-        var metaRecords = MetaControlRecord.CreateMetaControlsFrom(tazRecords);
+        var metaRecords = MetaControlRecord.CreateMetaControlsFrom(tazRecords, additionalHeaders);
         Assert.AreEqual(2, metaRecords.Length);
         Assert.AreEqual(24, metaRecords[0].TotalHouseholds);
         Assert.AreEqual(60, metaRecords[0].TotalPopulation);

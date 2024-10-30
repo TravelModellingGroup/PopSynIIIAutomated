@@ -2,118 +2,139 @@
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace PopSynIIIAutomated
+namespace PopSynIIIAutomated;
+
+/// <summary>
+/// Interaction logic for MainWindow.xaml
+/// </summary>
+public partial class MainWindow : Window
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
-    public partial class MainWindow : Window
+    private const string ConfigurationFilePath = "config.json";
+    private static string RunBoxText = string.Empty;
+    public MainWindow()
     {
-        private const string ConfigurationFilePath = "config.json";
-        private static string RunBoxText = string.Empty;
-        public MainWindow()
+        InitializeComponent();
+        IsEnabled = false;
+        DataContext = new ConfigurationModel(Configuration.DefaultConfiguration);
+        // Setup the runtime to dump out to a message box
+        Runtime.DisplayToUser = (message) =>
         {
-            InitializeComponent();
-            IsEnabled = false;
-            DataContext = new ConfigurationModel(Configuration.DefaultConfiguration);
-            // Setup the runtime to dump out to a message box
-            Runtime.DisplayToUser = (message) =>
-            {
-                RunBoxText = string.Concat(RunBoxText, "\n",  message);
-                Dispatcher.Invoke(() =>
-                {
-                    RunTextBox.Text = RunBoxText;
-                });
-            };
-            Task.Run(() =>
-            {
-                var config = Configuration.Load(ConfigurationFilePath);
-                Dispatcher.Invoke(() =>
-                {
-                    (DataContext as ConfigurationModel)?.SetConfiguration(config);
-                });
-            }).ContinueWith((task) =>
-            {
-                if (task.IsFaulted)
-                {
-                    ShowErrorMessage((task.Exception?.Message ?? "") + "\r\n" + (task.Exception?.StackTrace ?? ""));
-                }
-                Dispatcher.Invoke(() =>
-                {
-                    IsEnabled = true;
-                });
-            });
-        }
-
-        private async void Run_Clicked(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                await RunAllAsync((DataContext as ConfigurationModel)?.GetConfiguration() ?? Configuration.DefaultConfiguration);
-            }
-            catch (Exception ex)
-            {
-                ShowErrorMessage((ex.Message ?? "") + "\r\n" + ex.StackTrace);
-            }
-        }
-
-        private void ShowErrorMessage(string errorMessage)
-        {
+            RunBoxText = string.Concat(RunBoxText, "\n",  message);
             Dispatcher.Invoke(() =>
             {
-                MessageBox.Show(this, errorMessage);
+                RunTextBox.Text = RunBoxText;
             });
-        }
-
-        private Task RunAllAsync(Configuration config)
+        };
+        Task.Run(() =>
         {
-            config.Save(ConfigurationFilePath);
-            return Task.Run(() =>
+            var config = Configuration.Load(ConfigurationFilePath);
+            Dispatcher.Invoke(() =>
             {
-                Runtime.RunAll(config);
+                (DataContext as ConfigurationModel)?.SetConfiguration(config);
             });
-        }
-
-        private Task RunPreProcessorAsync(Configuration config)
+        }).ContinueWith((task) =>
         {
-            config.Save(ConfigurationFilePath);
-            return Task.Run(() =>
+            if (task.IsFaulted)
             {
-                Runtime.RunPreprocessor(config);
+                ShowErrorMessage((task.Exception?.Message ?? "") + "\r\n" + (task.Exception?.StackTrace ?? ""));
+            }
+            Dispatcher.Invoke(() =>
+            {
+                IsEnabled = true;
             });
-        }
+        });
+    }
 
-        private Task RunPostProcessorAsync(Configuration config)
+    private async void Run_Clicked(object sender, RoutedEventArgs e)
+    {
+        try
         {
-            config.Save(ConfigurationFilePath);
-            return Task.Run(() =>
-            {
-                Runtime.RunPostProcessor(config);
-            });
+            await RunAllAsync((DataContext as ConfigurationModel)?.GetConfiguration() ?? Configuration.DefaultConfiguration);
         }
-
-        private async void RunPreprocessor_Clicked(object sender, RoutedEventArgs e)
+        catch (Exception ex)
         {
-            try
-            {
-                await RunPreProcessorAsync((DataContext as ConfigurationModel)?.GetConfiguration() ?? Configuration.DefaultConfiguration);
-            }
-            catch (Exception ex)
-            {
-                ShowErrorMessage((ex.Message ?? "") + "\r\n" + ex.StackTrace);
-            }
-        }
-
-        private async void RunPostprocessor_Clicked(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                await RunPostProcessorAsync((DataContext as ConfigurationModel)?.GetConfiguration() ?? Configuration.DefaultConfiguration);
-            }
-            catch (Exception ex)
-            {
-                ShowErrorMessage((ex.Message ?? "") + "\r\n" + ex.StackTrace);
-            }
+            ShowErrorMessage((ex.Message ?? "") + "\r\n" + ex.StackTrace);
         }
     }
+
+    private void ShowErrorMessage(string errorMessage)
+    {
+        Dispatcher.Invoke(() =>
+        {
+            MessageBox.Show(this, errorMessage);
+        });
+    }
+
+    private Task RunAllAsync(Configuration config)
+    {
+        config.Save(ConfigurationFilePath);
+        return Task.Run(() =>
+        {
+            Runtime.RunAll(config);
+        });
+    }
+
+    private Task RunPreProcessorAsync(Configuration config)
+    {
+        config.Save(ConfigurationFilePath);
+        return Task.Run(() =>
+        {
+            Runtime.RunPreProcessor(config);
+        });
+    }
+
+    private Task RunWithoutPreProcessorAsync(Configuration config)
+    {
+        config.Save(ConfigurationFilePath);
+        return Task.Run(() =>
+        {
+            Runtime.RunWithoutPreProcessor(config);
+        });
+    }
+
+    private Task RunPostProcessorAsync(Configuration config)
+    {
+        config.Save(ConfigurationFilePath);
+        return Task.Run(() =>
+        {
+            Runtime.RunPostProcessor(config);
+        });
+    }
+
+    private async void RunPreProcessor_Clicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await RunPreProcessorAsync((DataContext as ConfigurationModel)?.GetConfiguration() ?? Configuration.DefaultConfiguration);
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage((ex.Message ?? "") + "\r\n" + ex.StackTrace);
+        }
+    }
+
+    private async void RunWithoutPreProcessor_Clicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await RunWithoutPreProcessorAsync((DataContext as ConfigurationModel)?.GetConfiguration() ?? Configuration.DefaultConfiguration);
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage((ex.Message ?? "") + "\r\n" + ex.StackTrace);
+        }
+    }
+
+    private async void RunPostProcessor_Clicked(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            await RunPostProcessorAsync((DataContext as ConfigurationModel)?.GetConfiguration() ?? Configuration.DefaultConfiguration);
+        }
+        catch (Exception ex)
+        {
+            ShowErrorMessage((ex.Message ?? "") + "\r\n" + ex.StackTrace);
+        }
+    }
+
 }

@@ -18,9 +18,9 @@ internal static class Preprocessor
         // Read in Forecast Population vector
         var forecast = LoadForecast(config);
         // Write updated TAZ/MAZ Controls
-        return TazControlFile.CreateForecastControls(config, zones, forecast)
+        return TazControlFile.CreateForecastControls(config, zones, forecast, out var additionalHeaders)
             // Write updated Meta Controls
-            && MetaControlFile.CreateForecastControls(config, LoadForecastedTazControlRecords(config));
+            && MetaControlFile.CreateForecastControls(config, LoadForecastedTazControlRecords(config), additionalHeaders);
     }
 
     /// <summary>
@@ -41,7 +41,8 @@ internal static class Preprocessor
     internal static TazControlRecord[] LoadForecastedTazControlRecords(Configuration config)
     {
         var fileName = Path.Combine(config.OutputDirectory, "taz_controls.csv");
-        return TazControlRecord.LoadRecordsFromLines(File.ReadAllLines(fileName));
+        // Ignore the additional headers
+        return TazControlRecord.LoadRecordsFromLines(File.ReadAllLines(fileName), out var _);
     }
 }
 

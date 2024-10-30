@@ -24,7 +24,7 @@ internal static class Runtime
     /// </summary>
     /// <param name="config">The configuration to use.</param>
     /// <returns>True if the operation succeeds.</returns>
-    public static bool RunPreprocessor(Configuration config)
+    public static bool RunPreProcessor(Configuration config)
     {
         return Preprocessor.Run(config);
     }
@@ -34,7 +34,7 @@ internal static class Runtime
     /// </summary>
     /// <param name="config">The configuration to use.</param>
     /// <returns>True if the operation succeeds.</returns>
-    public static bool RestartPopSyn(Configuration config)
+    public static bool RunWithoutPreProcessor(Configuration config)
     {
         return PopSynController.Run(config)
             && Postprocessor.Run(config);

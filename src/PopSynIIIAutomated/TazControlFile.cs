@@ -20,11 +20,11 @@ internal static class TazControlFile
     /// <param name="forecastPopulation">The future year population by TAZ.</param>
     /// <returns>True if the operation succeeds, false otherwise.</returns>
     public static bool CreateForecastControls(Configuration configuration, ZoneSystem zoneSystem,
-        Dictionary<int, float> forecastPopulation)
+        Dictionary<int, float> forecastPopulation, out string[]? additionalHeaders)
     {
         const float minimumBaseYearPopulation = 50;
         var lines = File.ReadAllLines(Path.Combine(configuration.InputDirectory, "BaseYearData/taz_controls.csv"));
-        var zoneRecords = TazControlRecord.LoadRecordsFromLines(lines);
+        var zoneRecords = TazControlRecord.LoadRecordsFromLines(lines, out additionalHeaders);
         var pumaRecords = ComputePUMAAverages(zoneRecords);
         var outputFilePath = CreateDirectories(Path.Combine(configuration.OutputDirectory, "taz_controls.csv"));
         using (var writer = new StreamWriter(outputFilePath))
@@ -87,9 +87,25 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
     /// </summary>
     /// <param name="lines">The lines to process.</param>
     /// <returns>An array of TAZ control records for each non-header line.</returns>
-    internal static TazControlRecord[] LoadRecordsFromLines(string[] lines)
+    internal static TazControlRecord[] LoadRecordsFromLines(string[] lines, out string[]? additionalHeaders)
     {
         var ret = new TazControlRecord[lines.Length - 1];
+        if(lines.Length == 0)
+        {
+            additionalHeaders = null;
+            return ret;
+        }
+        // Read the additional headers
+        static string[]? GetAdditionalHeaders(string headerLine)
+        {
+            var split = headerLine.Split(',');
+            if(split.Length <= 6)
+            {
+                return null;
+            }
+            return split.Skip(6).ToArray();
+        }
+        additionalHeaders = GetAdditionalHeaders(lines[0]);
         for (int i = 1; i < lines.Length; i++)
         {
             var parts = lines[i].Split(',');
