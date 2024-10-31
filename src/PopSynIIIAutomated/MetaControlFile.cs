@@ -40,7 +40,7 @@ internal static class MetaControlFile
 /// <param name="TotalHouseholds">The total households expected for the region.</param>
 /// <param name="TotalPopulation">The total population expected for the region.</param>
 /// <param name="AdditionalControls">Optional, the sum of any additional controls.</param>
-internal record MetaControlRecord(int Region, int Puma, int TotalHouseholds, int TotalPopulation, int[]? AdditionalControls)
+internal record MetaControlRecord(int Region, int Puma, int TotalHouseholds, int TotalPopulation, float[]? AdditionalControls)
 {
     /// <summary>
     /// Creates a meta control record given the TAZ control records.
@@ -52,7 +52,7 @@ internal record MetaControlRecord(int Region, int Puma, int TotalHouseholds, int
     {
         if (additionalHeaders is not null)
         {
-            int[] additionalControls = new int[additionalHeaders.Length];
+            float[] additionalControls = new float[additionalHeaders.Length];
             foreach (var record in group)
             {
                 var a = record.AdditionalControls;

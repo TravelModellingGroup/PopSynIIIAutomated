@@ -58,12 +58,37 @@ internal static class UtilityFunctions
     }
 
     /// <summary>
+    /// Write the scaled value to the stream followed by a comma.
+    /// </summary>
+    /// <param name="writer">The stream to write to.</param>
+    /// <param name="value">The initial value before scaling.</param>
+    /// <param name="scaleFactor">The factor to scale the value by.</param>
+    internal static void WriteThenComma(StreamWriter writer, float value, float scaleFactor)
+    {
+        writer.Write(Scale(value, scaleFactor));
+        writer.Write(',');
+    }
+
+    /// <summary>
     /// Scale the value by the scaling factor.
     /// </summary>
     /// <param name="value">The value to scale.</param>
     /// <param name="scaleFactor">The factor to scale it by.</param>
     /// <returns>The closest integer to the scaled value.</returns>
     internal static int Scale(int value, float scaleFactor)
+    {
+        // We don't need to worry about the accuracy of double because
+        // it can represent all 32bit integers perfectly.
+        return (int)Math.Round(value * scaleFactor);
+    }
+
+    /// <summary>
+    /// Scale the value by the scaling factor.
+    /// </summary>
+    /// <param name="value">The value to scale.</param>
+    /// <param name="scaleFactor">The factor to scale it by.</param>
+    /// <returns>The closest integer to the scaled value.</returns>
+    internal static int Scale(float value, float scaleFactor)
     {
         // We don't need to worry about the accuracy of double because
         // it can represent all 32bit integers perfectly.

@@ -80,7 +80,7 @@ internal static class TazControlFile
 /// <param name="TotalHouseholds">The total number of households in the TAZ</param>
 /// <param name="TotalPopulation">The total population in the TAZ.</param>
 /// <param name="AdditionalControls">Additional controls for the TAZ</param>
-internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseholds, int TotalPopulation, int[] AdditionalControls)
+internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseholds, int TotalPopulation, float[] AdditionalControls)
 {
     /// <summary>
     /// Load Taz Control Records from the given lines of CSV text.
@@ -116,7 +116,7 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
                 int.Parse(parts[4]),
                 int.Parse(parts[5]),
                 // Read the rest
-                parts.Skip(6).Select(x => int.Parse(x)).ToArray()
+                parts.Skip(6).Select(x => float.Parse(x)).ToArray()
             );
         }
         return ret;
@@ -130,7 +130,7 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
     internal static TazControlRecord ComputeGroupAverages(IGrouping<int, TazControlRecord> group)
     {
         float scaleFactor = 1.0f / group.Count();
-        var additionalControls = new int[group.First().AdditionalControls.Length];
+        var additionalControls = new float[group.First().AdditionalControls.Length];
         for (int i = 0; i < additionalControls.Length; i++)
         {
             additionalControls[i] = Scale(group.Sum(record => record.AdditionalControls[i]), scaleFactor);
