@@ -20,7 +20,7 @@ internal static class Preprocessor
         // Write updated TAZ/MAZ Controls
         return TazControlFile.CreateForecastControls(config, zones, forecast, out var additionalHeaders)
             // Write updated Meta Controls
-            && MetaControlFile.CreateForecastControls(config, LoadForecastedTazControlRecords(config), additionalHeaders);
+            && MetaControlFile.CreateForecastControls(config, LoadForecastedTazControlRecords(config, zones), additionalHeaders);
     }
 
     /// <summary>
@@ -38,11 +38,11 @@ internal static class Preprocessor
             .ToDictionary(parts => int.Parse(parts[0]), parts => float.Parse(parts[1]));
     }
 
-    internal static TazControlRecord[] LoadForecastedTazControlRecords(Configuration config)
+    internal static TazControlRecord[] LoadForecastedTazControlRecords(Configuration config, ZoneSystem zoneSystem)
     {
         var fileName = Path.Combine(config.OutputDirectory, "taz_controls.csv");
         // Ignore the additional headers
-        return TazControlRecord.LoadRecordsFromLines(File.ReadAllLines(fileName), out var _);
+        return TazControlRecord.LoadRecordsFromLines(File.ReadAllLines(fileName), zoneSystem, out var _);
     }
 }
 

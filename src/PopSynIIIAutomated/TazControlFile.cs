@@ -24,7 +24,7 @@ internal static class TazControlFile
     {
         const float minimumBaseYearPopulation = 50;
         var lines = File.ReadAllLines(Path.Combine(configuration.InputDirectory, "BaseYearData/taz_controls.csv"));
-        var zoneRecords = TazControlRecord.LoadRecordsFromLines(lines, out additionalHeaders);
+        var zoneRecords = TazControlRecord.LoadRecordsFromLines(lines, zoneSystem, out additionalHeaders);
         var pumaRecords = ComputePUMAAverages(zoneRecords);
         var outputFilePath = CreateDirectories(Path.Combine(configuration.OutputDirectory, "taz_controls.csv"));
         using (var writer = new StreamWriter(outputFilePath))
@@ -87,9 +87,9 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
     /// </summary>
     /// <param name="lines">The lines to process.</param>
     /// <returns>An array of TAZ control records for each non-header line.</returns>
-    internal static TazControlRecord[] LoadRecordsFromLines(string[] lines, out string[]? additionalHeaders)
+    internal static TazControlRecord[] LoadRecordsFromLines(string[] lines, ZoneSystem zoneSystem, out string[]? additionalHeaders)
     {
-        var ret = new TazControlRecord[lines.Length - 1];
+        var ret = new TazControlRecord[zoneSystem.NumberOfZones];
         if(lines.Length == 0)
         {
             additionalHeaders = null;
@@ -109,15 +109,28 @@ internal record TazControlRecord(int Region, int Puma, int TAZ, int TotalHouseho
         for (int i = 1; i < lines.Length; i++)
         {
             var parts = lines[i].Split(',');
-            ret[i - 1] = new TazControlRecord(
+            var taz = int.Parse(parts[2]);
+            ret[zoneSystem.ZoneNumberToZoneIndex(taz)] = new TazControlRecord(
                 int.Parse(parts[0]),
                 int.Parse(parts[1]),
-                int.Parse(parts[2]),
+                taz,
                 int.Parse(parts[4]),
                 int.Parse(parts[5]),
                 // Read the rest
                 parts.Skip(6).Select(x => float.Parse(x)).ToArray()
             );
+        }
+        // Fill in the rest of the data with empty records
+        for (int i = 0; i < ret.Length; i++)
+        {
+            if (ret[i] is null)
+            {
+                var taz = zoneSystem.GetZone(i);
+                ret[i] = new TazControlRecord(taz.PUMA, taz.PUMA, taz.TAZ, 0, 0, 
+                    additionalHeaders is not null ?
+                        new float[additionalHeaders.Length] 
+                        : []);
+            }
         }
         return ret;
     }

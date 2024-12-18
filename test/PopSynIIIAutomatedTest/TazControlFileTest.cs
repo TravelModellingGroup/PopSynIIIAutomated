@@ -15,7 +15,9 @@ public class TazControlFileTest
     {
         var lines = File.ReadAllLines("TestFiles/BaseYearData/taz_controls.csv");
         Assert.AreEqual(8, lines.Length, "Our test file had an unexpected number of lines!");
-        var records = TazControlRecord.LoadRecordsFromLines(lines, out var additionalHeaders);
+        Configuration config = new("TestFiles/Scenarios/TestScenario", "TestFiles", "Output", String.Empty, String.Empty, String.Empty, String.Empty);
+        ZoneSystem zones = new(config);
+        var records = TazControlRecord.LoadRecordsFromLines(lines, zones, out var additionalHeaders);
         Assert.IsNotNull(records);
         Assert.AreEqual(7, records.Length);
         // The last record has a zero population
@@ -49,7 +51,7 @@ public class TazControlFileTest
             { 7, 10.0f }
         }, out var _);
         Assert.IsTrue(File.Exists(outputPath));
-        var records = TazControlRecord.LoadRecordsFromLines(File.ReadAllLines(outputPath), out var _);
+        var records = TazControlRecord.LoadRecordsFromLines(File.ReadAllLines(outputPath), zones, out var _);
         Assert.IsNotNull(records);
         Assert.AreEqual(7, records.Length);
         for (int i = 0; i < records.Length; i++)
